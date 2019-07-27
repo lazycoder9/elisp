@@ -1,21 +1,28 @@
 # Elisp
+ LISP interpreter in Elixir
 
-**TODO: Add description**
+ Work in progress
 
-## Installation
+ Requirements: `elixir ~> 1.8.0`
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `elisp` to your list of dependencies in `mix.exs`:
+ Usage
+ ```
+ mix escript.build
+ ./elisp
+ ````
 
-```elixir
-def deps do
-  [
-    {:elisp, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/elisp](https://hexdocs.pm/elisp).
-
+ Interpreter will run in repl mode and you can execute simple S-expressions
+ ```
+ >>> (+ 1 1)
+ 2
+ >>> (def a 10)
+ :ok
+ >>> (* a 2)
+ 20
+ >>> (def double (lambda (x) (* x 2)))
+ :ok
+ >>> (double 20)
+ 40
+ >>> (double a)
+ 20
+ ```

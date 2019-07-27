@@ -10,10 +10,6 @@ defmodule Symbol do
   defstruct value: nil
 end
 
-defmodule BinOp do
-  defstruct value: nil
-end
-
 defmodule BinPred do
   defstruct value: nil
 end
@@ -27,7 +23,7 @@ defmodule Lambda do
 end
 
 defmodule Elisp do
-  alias Elisp.Env
+  alias Elisp.{Env, BinOp}
 
   @cons_signature_funs %{
     Function => [Kernel, :is_function],
@@ -203,6 +199,7 @@ defmodule Elisp do
     cond do
       is_conslist(o) -> show(:cons, o, "")
       Map.has_key?(@keywords_vk, o) -> @keywords_vk[o]
+      true -> o
     end
   end
 
@@ -336,11 +333,13 @@ defmodule Elisp do
 
       :def ->
         Env.def_var(env, object_eval_to_symbol(car(args), env), evalrec(car(cdr(args)), env))
-        |> repl
+
+      # |> repl
 
       :set ->
         Env.set_var(env, object_eval_to_symbol(car(args), env), evalrec(car(cdr(args)), env))
-        |> repl
+
+      # |> repl
 
       :get ->
         s = car(args)
@@ -369,9 +368,6 @@ defmodule Elisp do
 
   def evalrec(%Symbol{value: value} = o, env), do: Env.get_var(env, value, o)
 
-  # def evalrec(%Lambda{args: args, body: body, env: e}, env),
-  #   do: evalrec(body, %Env{frame: get_map_names_values(args, tail, env, true), parent: e})
-
   def evalrec({head, tail}, env) do
     h = evalrec(head, env)
 
@@ -387,9 +383,8 @@ defmodule Elisp do
 
       %Lambda{args: args, body: body, env: e} ->
         map = get_map_names_values(args, tail, env, true)
-        # require IEx
-        # IEx.pry()
-        evalrec(body, Env.start_link(e, map))
+        {:ok, lambda_env} = Env.start_link(e, map)
+        evalrec(body, lambda_env)
 
       _ ->
         eval_list(h, tail, env)
@@ -402,25 +397,5 @@ defmodule Elisp do
 
   def eval_list(_, t, env) do
     eval_list(evalrec(car(t), env), cdr(t), env)
-  end
-
-  def repl(), do: repl(Env.start_link())
-
-  def repl(env) do
-    input = IO.gets(">>> ")
-
-    case input do
-      ":q\n" ->
-        IO.puts("Bye!")
-
-      inp ->
-        inp
-        |> parse
-        |> evalrec(env)
-        |> show
-        |> IO.inspect()
-
-        repl(env)
-    end
   end
 end
