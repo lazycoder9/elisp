@@ -363,8 +363,10 @@ defmodule Elisp do
 
       %Lambda{args: args, body: body, env: e} ->
         map = get_map_names_values(args, tail, env, true)
-        {:ok, lambda_env} = Env.start_link(e, map)
-        evalrec(body, lambda_env)
+        {:ok, lambda_env} = Env.start(e, map)
+        result = evalrec(body, lambda_env)
+        Process.exit(lambda_env, :kill)
+        result
 
       _ ->
         eval_list(h, tail, env)

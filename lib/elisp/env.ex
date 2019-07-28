@@ -1,8 +1,8 @@
 defmodule Elisp.Env do
   alias Elisp.Symbol
 
-  def start_link(parent \\ nil, frame \\ %{}) do
-    Agent.start_link(fn -> %{frame: frame, parent: parent} end)
+  def start(parent \\ nil, frame \\ %{}) do
+    Agent.start(fn -> %{frame: frame, parent: parent} end)
   end
 
   def get_var(nil, _, %Symbol{} = s), do: s
