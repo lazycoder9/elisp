@@ -6,24 +6,8 @@ defimpl String.Chars, for: SpecialForm do
   def to_string(se), do: se.value
 end
 
-defmodule Symbol do
-  defstruct value: nil
-end
-
-defmodule BinPred do
-  defstruct value: nil
-end
-
-defmodule SpecialForm do
-  defstruct value: nil
-end
-
-defmodule Lambda do
-  defstruct [:args, :body, :env]
-end
-
 defmodule Elisp do
-  alias Elisp.{Env, BinOp}
+  alias Elisp.{Env, BinOp, BinPred, Symbol, Lambda, SpecialForm}
 
   @cons_signature_funs %{
     Function => [Kernel, :is_function],
@@ -334,12 +318,8 @@ defmodule Elisp do
       :def ->
         Env.def_var(env, object_eval_to_symbol(car(args), env), evalrec(car(cdr(args)), env))
 
-      # |> repl
-
       :set ->
         Env.set_var(env, object_eval_to_symbol(car(args), env), evalrec(car(cdr(args)), env))
-
-      # |> repl
 
       :get ->
         s = car(args)
@@ -393,7 +373,7 @@ defmodule Elisp do
 
   def evalrec(o, _), do: o
 
-  def eval_list(h, t, _) when is_none(t), do: t
+  def eval_list(h, t, _) when is_none(t), do: h
 
   def eval_list(_, t, env) do
     eval_list(evalrec(car(t), env), cdr(t), env)

@@ -27,7 +27,7 @@ defmodule Elisp.Env do
     Agent.update(pid, fn %{frame: frame, parent: parent} = state ->
       case Map.get(frame, key) do
         nil -> set_var(parent, key, value)
-        true -> %{state | frame: %{frame | key => value}}
+        _ -> %{state | frame: %{frame | key => value}}
       end
     end)
   end
